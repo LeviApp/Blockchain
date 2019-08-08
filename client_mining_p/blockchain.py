@@ -87,8 +87,6 @@ class Blockchain(object):
         while self.valid_proof(last_proof, proof) == False:
             proof+=1
 
-        pass
-
     @staticmethod
     def valid_proof(last_proof, proof):
         """
@@ -106,7 +104,6 @@ class Blockchain(object):
         
         else:
             return False
-        pass
 
     def valid_chain(self, chain):
         """

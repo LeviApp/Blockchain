@@ -16,7 +16,7 @@ def proof_of_work(last_proof):
     """
 
     print("Start work on a new proof")
-    proof = 0
+    proof = 4
 
     # for block 1, hash(1, p) = 000000x
 
@@ -69,7 +69,7 @@ if __name__ == '__main__':
         if res.json()['message'] == "New Block Forged First":
             # add 1 to the number of coins mined and print it.  Otherwise,
             coins_mined += 1
-            print("You have: " + str(coins_mined) + " coins", f'miner 1 won the block {proof_data}')
+            print("You have: " + str(coins_mined) + " coins", f'miner 2 won the block {proof_data}')
 
             res.json()['message'] = "New Block Was Forged Before You"
 

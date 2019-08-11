@@ -1,5 +1,3 @@
-# Paste your version of blockchain.py from the basic_block_gp
-# folder here
 import hashlib
 import json
 from time import time
@@ -14,7 +12,7 @@ class Blockchain(object):
         self.current_transactions = []
         self.nodes = set()
 
-        self.new_block(previous_hash=1, proof=99)
+        self.new_block(previous_hash=1, proof=44)
 
     def new_block(self, proof, previous_hash=None):
         """
@@ -85,7 +83,9 @@ class Blockchain(object):
         proof = 4
 
         while self.valid_proof(last_proof, proof) == False:
-            proof+=1
+            proof+=4
+
+        return proof
 
     @staticmethod
     def valid_proof(last_proof, proof):
@@ -97,13 +97,14 @@ class Blockchain(object):
         combined = f'{last_proof}{proof}'.encode()
 
         value = hashlib.sha256(combined).hexdigest()
-        value6 = value[0:6]
+        value4 = value[0:4]
 
-        if value6 == '000000':
+        if value4 == '0000':
             return True
         
         else:
             return False
+        pass
 
     def valid_chain(self, chain):
         """
@@ -142,42 +143,44 @@ node_identifier = str(uuid4()).replace('-', '')
 # Instantiate the Blockchain
 blockchain = Blockchain()
 
-def mine():
-    # We run the proof of work algorithm to get the next proof...
-    proof = blockchain.proof_of_work(blockchain.last_block)
-
-    # We must receive a reward for finding the proof.
-    # TODO:
-    blockchain.new_transaction(0, node_identifier, 1)
-    # The sender is "0" to signify that this node has mine a new coin
-    # The recipient is the current node, it did the mining!
-    # The amount is 1 coin as a reward for mining the next block
-
-    # Forge the new Block by adding it to the chain
-    # TODO
-
-    block = blockchain.new_block(proof, blockchain.hash(blockchain.last_block))
 
     # Send a response with the new block
-    response = {
-        'message': "New Block Forged",
-        'index': block['index'],
-        'transactions': block['transactions'],
-        'proof': block['proof'],
-        'previous_hash': block['previous_hash'],
-    }
-    return jsonify(response), 200
 
-@app.route('/mine', methods=['GET'])
-def mine_again():
-    try:
-        while True:
-            mine()
-    
-    except KeyboardInterrupt:
-        return jsonify(blockchain.chain), 200
+@app.route('/mine', methods=['POST'])
+def mine():
+    # We run the proof of work algorithm to get the next proof...
+    values = request.get_json()
+    proof = values['proof']
+    if (blockchain.valid_proof(blockchain.last_block["proof"], proof)):
 
 
+
+
+        # We must receive a reward for finding the proof.
+        # TODO:
+        blockchain.new_transaction(0, node_identifier, 1)
+        # The sender is "0" to signify that this node has mine a new coin
+        # The recipient is the current node, it did the mining!
+        # The amount is 1 coin as a reward for mining the next block
+
+        # Forge the new Block by adding it to the chain
+        # TODO
+
+        block = blockchain.new_block(proof, blockchain.hash(blockchain.last_block))
+
+        response = {
+            'message': "New Block Forged",
+            'index': block['index'],
+            'transactions': block['transactions'],
+            'proof': block['proof'],
+            'previous_hash': block['previous_hash'],
+        }
+        return jsonify(response), 200
+    else:
+        response = {
+            'message': "Failed",
+        }
+        return jsonify(response), 200
 
 
 
@@ -210,6 +213,21 @@ def full_chain():
     return jsonify(response), 200
 
 
+
+
+
+
+
+@app.route('/last_proof', methods=['GET'])
+
+def last_proof():
+    response = {
+        "proof": blockchain.last_block['proof']
+    }
+    
+    return jsonify(response), 200
+
 # Run the program on port 5000
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=4444)
+    # app.run(host='0.0.0.0', port=4444)
+    app.run(host='localhost', port=5000)

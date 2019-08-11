@@ -85,7 +85,7 @@ class Blockchain(object):
         while self.valid_proof(last_proof, proof) == False:
             proof+=1
 
-        pass
+        return proof
 
     @staticmethod
     def valid_proof(last_proof, proof):
@@ -97,9 +97,9 @@ class Blockchain(object):
         combined = f'{last_proof}{proof}'.encode()
 
         value = hashlib.sha256(combined).hexdigest()
-        value6 = value[0:6]
+        value4 = value[0:4]
 
-        if value6 == '000000':
+        if value4 == '0000':
             return True
         
         else:
@@ -210,6 +210,18 @@ def full_chain():
     }
     return jsonify(response), 200
 
+
+
+
+
+
+
+@app.route('/last_proof', methods=['GET'])
+
+def last():
+    response = blockchain.chain[-1]["proof"]
+    
+    return jsonify(response), 200
 
 # Run the program on port 5000
 if __name__ == '__main__':
